@@ -1,0 +1,12 @@
+test/
+dist/
+temp/
+/venv
+/.idea
+*Pipfile*
+__pycache__/
+log/
+*temp*
+*test*
+build/
+*egg-info/
