@@ -26,6 +26,8 @@ def read_original_data(filename: str):
     matrix_dict = dict()
     with open(filename, "r", encoding="utf-8") as txt_file:
         for idx, line in enumerate(txt_file):
+            if idx > 1000:
+                break
             user_id, item_id, rating = line.strip().split('\t')[:3]
             user_id = int(user_id)
             item_id = int(item_id)
@@ -39,11 +41,12 @@ if __name__ == "__main__":
     user_ids, item_ids, matrix_info = read_original_data(filename="../data/ml-100k/u.data")
     model = MatrixFactorization(n_items=max(item_ids) + 1, n_users=max(user_ids) + 1, n_factors=300)
     loss_fn = nn.MSELoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
     epochs = 5
     for epoch in range(epochs):
         print(epoch)
-        loss = []
+        loss = 0
+        loss0 = 0
         for r, c in zip(user_ids, item_ids):
             i = torch.LongTensor([r])
             j = torch.LongTensor([c])
@@ -52,15 +55,18 @@ if __name__ == "__main__":
             rating = torch.FloatTensor([matrix_info[str(r) + "_" + str(c)]])
             # predict
             prediction = model.forward(i, j)
-            loss.append(loss_fn(prediction, rating))
-
+            loss += loss_fn(prediction, rating)
+            loss0 += loss_fn(prediction, rating)
+            for params in model.parameters():
+                loss += 0.01 * torch.norm(params, 1)
+                loss += 0.01 * torch.norm(params, 2)
 
         # Reset the gradients to 0
         optimizer.zero_grad()
 
         # backpropagate
-        [l.backward() for l in loss]
+        loss.backward()
 
         # update weights
         optimizer.step()
-        print(sum(loss))
+        print(loss0)
