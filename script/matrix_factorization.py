@@ -16,7 +16,7 @@ class MatrixFactorization(torch.nn.Module):
         feat_item = self.items_vectors(item_id)
         bias_user = self.users_bias(user_id)
         bias_item = self.items_bias(item_id)
-        result = (feat_user * feat_item).sum(axis=-1) + bias_item + bias_user
+        result = (feat_user * feat_item).sum(-1) + bias_item.sum(-1) + bias_user.sum(-1)
         return result
 
 
@@ -25,7 +25,7 @@ def read_original_data(filename: str):
     item_list = []
     matrix_dict = dict()
     with open(filename, "r", encoding="utf-8") as txt_file:
-        for line in txt_file:
+        for idx, line in enumerate(txt_file):
             user_id, item_id, rating = line.strip().split('\t')[:3]
             user_id = int(user_id)
             item_id = int(item_id)
@@ -37,13 +37,13 @@ def read_original_data(filename: str):
 
 if __name__ == "__main__":
     user_ids, item_ids, matrix_info = read_original_data(filename="../data/ml-100k/u.data")
-    model = MatrixFactorization(n_items=len(item_ids), n_users=len(user_ids), n_factors=300)
+    model = MatrixFactorization(n_items=max(item_ids) + 1, n_users=max(user_ids) + 1, n_factors=300)
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
     epochs = 5
     for epoch in range(epochs):
         print(epoch)
-        loss = 0
+        loss = []
         for r, c in zip(user_ids, item_ids):
             i = torch.LongTensor([r])
             j = torch.LongTensor([c])
@@ -52,14 +52,15 @@ if __name__ == "__main__":
             rating = torch.FloatTensor([matrix_info[str(r) + "_" + str(c)]])
             # predict
             prediction = model.forward(i, j)
-            loss += loss_fn(prediction, rating)
+            loss.append(loss_fn(prediction, rating))
+
 
         # Reset the gradients to 0
         optimizer.zero_grad()
 
         # backpropagate
-        loss.backward()
+        [l.backward() for l in loss]
 
         # update weights
         optimizer.step()
-        print(loss)
+        print(sum(loss))
