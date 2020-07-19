@@ -103,6 +103,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=0.002)
     epochs = 25
     for i in range(epochs):
+        print(i)
         loss = 0
         for train_vector in train_matrix:
             prediction = model.forward(torch.FloatTensor([train_vector]), is_train=1)
