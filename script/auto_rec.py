@@ -7,10 +7,10 @@ class AutoRec(torch.nn.Module):
     def __init__(self, n_users):
         super().__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(n_users, n_users),
+            nn.Linear(n_users, 10),
             nn.Sigmoid(),  # 激活函数
             nn.Dropout(0.2),
-            nn.Linear(n_users, n_users),
+            nn.Linear(10, n_users),
             nn.Dropout(0.2),
             nn.Sigmoid()
         )
@@ -33,7 +33,7 @@ def read_original_data(filename: str):
 
     with open(filename, "r", encoding="utf-8") as txt_file:
         for idx, line in enumerate(txt_file):
-            # if idx > 5000:
+            # if idx > 50:
             #     break
             user_id, item_id, rating, times = line.strip().split('\t')
             user_id = int(user_id)
@@ -104,18 +104,20 @@ if __name__ == "__main__":
     epochs = 25
     for i in range(epochs):
         print(i)
-        loss = 0
+        loss = []
+        loss_local = 0
         for train_vector in train_matrix:
             prediction = model.forward(torch.FloatTensor([train_vector]), is_train=1)
-            loss += loss_fn(torch.FloatTensor([train_vector]), prediction)
+            loss_local += loss_fn(torch.FloatTensor([train_vector]), prediction)
             for params in model.parameters():
-                loss += 0.01 * torch.norm(params, 1)
-                loss += 0.01 * torch.norm(params, 2)
+                loss_local += 0.01 * torch.norm(params, 1)
+                loss_local += 0.01 * torch.norm(params, 2)
+            loss.append(loss_local)
         # Reset the gradients to 0
         optimizer.zero_grad()
 
         # backpropagate
-        loss.backward()
+        [l.backward(retain_graph=True) for l in loss]
 
         # update weights
         optimizer.step()

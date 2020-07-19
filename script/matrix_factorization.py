@@ -30,8 +30,8 @@ def read_original_data(filename: str):
 
     with open(filename, "r", encoding="utf-8") as txt_file:
         for idx, line in enumerate(txt_file):
-            if idx > 500:
-                break
+            # if idx > 50:
+            #     break
             user_id, item_id, rating, times = line.strip().split('\t')
             user_id = int(user_id)
             item_id = int(item_id)
@@ -71,26 +71,31 @@ if __name__ == "__main__":
     # train
     model = MatrixFactorization(n_items=max_min_item[1], n_users=max_min_user[1], n_factors=300)
     loss_fn = nn.MSELoss()
-    optimizer = torch.optim.SparseAdam(model.parameters(), lr=0.05)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.05)
     epochs = 50
     for epoch in range(epochs):
         print(epoch)
-        loss = 0
-        for element in train_data:
+        loss = []
+        loss_local = 0
+        for idx, element in enumerate(train_data):
+            if idx > 0 and idx % 500 == 0:
+                loss.append(loss_local)
+                loss_local = 0
             user_id, item_id, rating = element
             i = torch.LongTensor([user_id - 1])
             j = torch.LongTensor([item_id - 1])
             rating = torch.FloatTensor([rating])
             # predict
             prediction = model.forward(i, j)
-            loss += loss_fn(prediction, rating)
-            # for params in model.parameters():
-            #     loss += 0.01 * torch.norm(params, 1)
-            #     loss += 0.01 * torch.norm(params, 2)
+            loss_local += loss_fn(prediction, rating)
+            for params in model.parameters():
+                loss_local += 0.01 * torch.norm(params, 1)
+                loss_local += 0.01 * torch.norm(params, 2)
+        loss.append(loss_local)
         # Reset the gradients to 0
         optimizer.zero_grad()
         # backpropagate
-        loss.backward()
+        [l.backward() for l in loss]
         # update weights
         optimizer.step()
         print(loss)
