@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 
 class MatrixFactorization(torch.nn.Module):
@@ -106,4 +107,4 @@ if __name__ == "__main__":
         mse += (rating - predict_value) ** 2
         result_file.write(write_format(target_list=[user_id, item_id, rating, predict_value]))
     result_file.close()
-    print(mse / len(test_data))
+    print(np.sqrt(mse / len(test_data)))

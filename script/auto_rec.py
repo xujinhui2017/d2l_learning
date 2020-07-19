@@ -86,6 +86,7 @@ def evaluate(test_info: list, predict_matrix: list, filename: str):
             txt_file.write(write_format(target_list=[user_id, item_id, rating, predict_value]))
 
     mse /= len(test_data)
+    mse = np.sqrt(mse)
     print(mse)
 
 
