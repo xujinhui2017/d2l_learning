@@ -38,7 +38,7 @@ def read_original_data(filename: str):
     return user_list, item_list, matrix_dict
 
 if __name__ == "__main__":
-    user_ids, item_ids, matrix_info = read_original_data(filename="../data/u.data")
+    user_ids, item_ids, matrix_info = read_original_data(filename="data/u.data")
     model = MatrixFactorization(n_items=max(item_ids) + 1, n_users=max(user_ids) + 1, n_factors=300)
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
