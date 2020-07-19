@@ -84,6 +84,5 @@ if __name__ == "__main__":
     # d2l.plt.ylabel('Count')
     # d2l.plt.title('Distribution of Ratings in MovieLens 100K')
     # d2l.plt.show()
-    a = np.array([1, 2])
-    print(a < 1.5)
+    read_data_ml100k()
     pass
