@@ -7,10 +7,10 @@ class AutoRec(torch.nn.Module):
     def __init__(self, n_users):
         super().__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(n_users, 10),
+            nn.Linear(n_users, 50),
             nn.Sigmoid(),  # 激活函数
             nn.Dropout(0.2),
-            nn.Linear(10, n_users),
+            nn.Linear(50, n_users),
             nn.Dropout(0.2),
             nn.Sigmoid()
         )
@@ -100,28 +100,25 @@ if __name__ == "__main__":
     # train
     model = AutoRec(n_users=max_user_ids)
     loss_fn = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.002)
-    epochs = 25
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.002, weight_decay=0.01)
+    epochs = 100
     for i in range(epochs):
-        print(i)
-        loss = []
-        loss_local = 0
+        loss = 0
         for train_vector in train_matrix:
             prediction = model.forward(torch.FloatTensor([train_vector]), is_train=1)
-            loss_local += loss_fn(torch.FloatTensor([train_vector]), prediction)
-            for params in model.parameters():
-                loss_local += 0.01 * torch.norm(params, 1)
-                loss_local += 0.01 * torch.norm(params, 2)
-            loss.append(loss_local)
+            loss += loss_fn(torch.FloatTensor([train_vector]), prediction)
+            # for params in model.parameters():
+            #     loss_local += 0.01 * torch.norm(params, 1)
+            #     loss_local += 0.01 * torch.norm(params, 2)
         # Reset the gradients to 0
         optimizer.zero_grad()
 
         # backpropagate
-        [l.backward(retain_graph=True) for l in loss]
+        loss.backward()
 
         # update weights
         optimizer.step()
-        print(loss)
+        print(i, loss)
 
     # predict and evaluate
     predict_info = list()
