@@ -77,7 +77,7 @@ if __name__ == "__main__":
         print(epoch)
         loss = 0
         for idx, element in enumerate(train_data):
-            if idx > 0 and idx % 500 == 0:
+            if idx > 0 and idx % 5000 == 0:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
