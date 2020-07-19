@@ -106,4 +106,4 @@ if __name__ == "__main__":
         mse += (rating - predict_value) ** 2
         result_file.write(write_format(target_list=[user_id, item_id, rating, predict_value]))
     result_file.close()
-    print(mse)
+    print(mse / len(test_data))
