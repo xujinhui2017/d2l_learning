@@ -108,6 +108,9 @@ if __name__ == "__main__":
         for train_vector in train_matrix:
             prediction = model.forward(torch.FloatTensor([train_vector]), is_train=1)
             loss += loss_fn(torch.FloatTensor([train_vector]), prediction)
+            for params in model.parameters():
+                loss += 0.01 * torch.norm(params, 1)
+                loss += 0.01 * torch.norm(params, 2)
         # Reset the gradients to 0
         optimizer.zero_grad()
 
