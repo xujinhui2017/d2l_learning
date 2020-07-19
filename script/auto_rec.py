@@ -72,12 +72,18 @@ def generate_matrix(n_items: int, n_users: int, data: list):
     return result
 
 
-def evaluate(test_info: list, predict_matrix: list):
+def write_format(target_list: list):
+    return "\t".join([str(i) for i in target_list]) + "\n"
+
+
+def evaluate(test_info: list, predict_matrix: list, filename: str):
     mse = 0
-    for element in test_info:
-        user_id, item_id, rating = element
-        predict_value = predict_matrix[item_id - 1][user_id - 1]
-        mse += (predict_value - rating) ** 2
+    with open(filename, "w", encoding="utf-8") as txt_file:
+        for element in test_info:
+            user_id, item_id, rating = element
+            predict_value = predict_matrix[item_id - 1][user_id - 1]
+            mse += (predict_value - rating) ** 2
+            txt_file.write(write_format(target_list=[user_id, item_id, rating, predict_value]))
 
     mse /= len(test_data)
     print(mse)
@@ -90,6 +96,7 @@ if __name__ == "__main__":
     print(max_user_ids, max_item_ids)
     train_matrix = generate_matrix(n_users=max_user_ids, n_items=max_item_ids, data=train_data)
 
+    # train
     model = AutoRec(n_users=max_user_ids)
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.002)
@@ -114,5 +121,5 @@ if __name__ == "__main__":
     for vector in train_matrix:
         prediction = model.forward(torch.FloatTensor([vector]), is_train=0)
         predict_info.append(prediction.detach().numpy().reshape(-1).tolist())
-    evaluate(test_info=test_data, predict_matrix=predict_info)
+    evaluate(test_info=test_data, predict_matrix=predict_info, filename="data/autorec.test_result")
     pass
