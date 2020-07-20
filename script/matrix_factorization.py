@@ -17,7 +17,7 @@ class MatrixFactorization(torch.nn.Module):
         )
         self.items_bias = nn.Embedding.from_pretrained(
             torch.from_numpy(np.array([[0.] * 1] * n_items)).requires_grad_()
-                                                       ).
+                                                       )
         # print(self.items_bias)
         # print(nn.Embedding(n_items, 1))
         # self.items_vectors = nn.Embedding(n_items, n_factors)
