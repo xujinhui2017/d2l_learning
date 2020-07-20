@@ -74,14 +74,22 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=0.05, weight_decay=0.01)
     epochs = 50
     for epoch in range(epochs):
-        print(epoch)
+        for param_group in optimizer.param_groups:
+            if epoch < 5:
+                param_group["lr"] = 0.1
+            elif epoch < 10:
+                param_group["lr"] = 0.05
+            elif epoch < 20:
+                param_group["lr"] = 0.01
+            else:
+                param_group["lr"] = 0.002
         loss = 0
         for idx, element in enumerate(train_data):
             if idx > 0 and idx % 5000 == 0:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-                print(idx, loss)
+                print(epoch, idx, loss)
                 loss = 0
 
             user_id, item_id, rating = element
@@ -98,7 +106,7 @@ if __name__ == "__main__":
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        print(idx, loss)
+        print(epoch, idx, loss)
 
     # test
     mse = 0
