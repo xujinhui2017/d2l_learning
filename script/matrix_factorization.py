@@ -6,24 +6,16 @@ import numpy as np
 class MatrixFactorization(torch.nn.Module):
     def __init__(self, n_users, n_items, n_factors=300):
         super().__init__()
-        # self.items_vectors = nn.Embedding.from_pretrained(torch.from_numpy(
-        #     np.array([[0.] * n_factors] * n_items)).requires_grad_()
-        # )
-        # self.users_vectors = nn.Embedding.from_pretrained(torch.from_numpy(
-        #     np.array([[0.] * n_factors] * n_users)).requires_grad_()
-        #                                                   )
-        # self.users_bias = nn.Embedding.from_pretrained(
-        #     torch.from_numpy(np.array([[0.] * 1] * n_users)).requires_grad_()
-        # )
-        # self.items_bias = nn.Embedding.from_pretrained(
-        #     torch.from_numpy(np.array([[0.] * 1] * n_items)).requires_grad_()
-        #                                                )
+        self.items_vectors = torch.zeros([n_items, n_factors], requires_grad=True)
+        self.users_vectors = torch.zeros([n_users, n_factors], requires_grad=True)
+        self.users_bias = torch.zeros([n_users, 1], requires_grad=True)
+        self.items_bias = torch.zeros([n_items, 1], requires_grad=True)
         # print(self.items_bias)
         # print(nn.Embedding(n_items, 1))
-        self.items_vectors = nn.Embedding(n_items, n_factors, max_norm=1)
-        self.users_vectors = nn.Embedding(n_users, n_factors, max_norm=1)
-        self.users_bias = nn.Embedding(n_users, 1, max_norm=1)
-        self.items_bias = nn.Embedding(n_items, 1, max_norm=1)
+        # self.items_vectors = nn.Embedding(n_items, n_factors, max_norm=1)
+        # self.users_vectors = nn.Embedding(n_users, n_factors, max_norm=1)
+        # self.users_bias = nn.Embedding(n_users, 1, max_norm=1)
+        # self.items_bias = nn.Embedding(n_items, 1, max_norm=1)
 
     def forward(self, user_id, item_id):
         feat_user = self.users_vectors(user_id)
