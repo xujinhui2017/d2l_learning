@@ -14,10 +14,10 @@ class MatrixFactorization(torch.nn.Module):
                                                        )
         # print(self.items_bias)
         # print(nn.Embedding(n_items, 1))
-        self.items_vectors = nn.Embedding(n_items, n_factors, max_norm=1)
-        self.users_vectors = nn.Embedding(n_users, n_factors, max_norm=1)
-        self.users_bias = nn.Embedding(n_users, 1, max_norm=1)
-        self.items_bias = nn.Embedding(n_items, 1, max_norm=1)
+        # self.items_vectors = nn.Embedding(n_items, n_factors, max_norm=1)
+        # self.users_vectors = nn.Embedding(n_users, n_factors, max_norm=1)
+        # self.users_bias = nn.Embedding(n_users, 1, max_norm=1)
+        # self.items_bias = nn.Embedding(n_items, 1, max_norm=1)
 
     def forward(self, user_id, item_id):
         feat_user = self.users_vectors(user_id)
