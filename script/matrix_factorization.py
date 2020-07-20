@@ -33,8 +33,8 @@ def read_original_data(filename: str):
 
     with open(filename, "r", encoding="utf-8") as txt_file:
         for idx, line in enumerate(txt_file):
-            if idx > 50:
-                break
+            # if idx > 50:
+            #     break
             user_id, item_id, rating, times = line.strip().split('\t')
             user_id = int(user_id)
             item_id = int(item_id)
