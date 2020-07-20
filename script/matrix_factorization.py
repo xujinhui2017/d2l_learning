@@ -6,16 +6,16 @@ import numpy as np
 class MatrixFactorization(torch.nn.Module):
     def __init__(self, n_users, n_items, n_factors=300):
         super().__init__()
-        self.items_vectors = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0.01] * n_factors] * n_items)))
-        self.users_vectors = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0.01] * n_factors] * n_users)))
-        self.users_bias = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0.01] * 1] * n_users)))
-        self.items_bias = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0.01] * 1] * n_items)))
-        print(self.items_bias)
-        print(nn.Embedding(n_items, 1))
-        # self.items_vectors = nn.Embedding(n_items, n_factors)
-        # self.users_vectors = nn.Embedding(n_users, n_factors)
-        # self.users_bias = nn.Embedding(n_users, 1)
-        # self.items_bias = nn.Embedding(n_items, 1)
+        # self.items_vectors = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0.01] * n_factors] * n_items)))
+        # self.users_vectors = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0.01] * n_factors] * n_users)))
+        # self.users_bias = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0.01] * 1] * n_users)))
+        # self.items_bias = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0.01] * 1] * n_items)))
+        # print(self.items_bias)
+        # print(nn.Embedding(n_items, 1))
+        self.items_vectors = nn.Embedding(n_items, n_factors)
+        self.users_vectors = nn.Embedding(n_users, n_factors)
+        self.users_bias = nn.Embedding(n_users, 1)
+        self.items_bias = nn.Embedding(n_items, 1)
 
     def forward(self, user_id, item_id):
         feat_user = self.users_vectors(user_id)
