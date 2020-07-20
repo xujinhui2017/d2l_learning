@@ -7,17 +7,17 @@ class MatrixFactorization(torch.nn.Module):
     def __init__(self, n_users, n_items, n_factors=300):
         super().__init__()
         self.items_vectors = nn.Embedding.from_pretrained(torch.from_numpy(
-            np.array([[0.] * n_factors] * n_items)).requires_grad_(True)
+            np.array([[0.] * n_factors] * n_items)).requires_grad_()
         )
         self.users_vectors = nn.Embedding.from_pretrained(torch.from_numpy(
-            np.array([[0.] * n_factors] * n_users)).requires_grad_(True)
+            np.array([[0.] * n_factors] * n_users)).requires_grad_()
                                                           )
         self.users_bias = nn.Embedding.from_pretrained(
-            torch.from_numpy(np.array([[0.] * 1] * n_users)).requires_grad_(True)
+            torch.from_numpy(np.array([[0.] * 1] * n_users)).requires_grad_()
         )
         self.items_bias = nn.Embedding.from_pretrained(
-            torch.from_numpy(np.array([[0.] * 1] * n_items)).requires_grad_(True)
-                                                       )
+            torch.from_numpy(np.array([[0.] * 1] * n_items)).requires_grad_()
+                                                       ).
         # print(self.items_bias)
         # print(nn.Embedding(n_items, 1))
         # self.items_vectors = nn.Embedding(n_items, n_factors)
