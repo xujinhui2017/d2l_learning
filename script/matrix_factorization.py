@@ -86,7 +86,7 @@ if __name__ == "__main__":
                 param_group["lr"] = 0.1
             elif epoch < 10:
                 param_group["lr"] = 0.05
-            elif epoch < 20:
+            elif epoch < 30:
                 param_group["lr"] = 0.01
             else:
                 param_group["lr"] = 0.002
