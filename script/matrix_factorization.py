@@ -6,11 +6,14 @@ import numpy as np
 class MatrixFactorization(torch.nn.Module):
     def __init__(self, n_users, n_items, n_factors=300):
         super().__init__()
-
-        self.items_vectors = nn.Embedding(n_items, n_factors)
-        self.users_vectors = nn.Embedding(n_users, n_factors)
-        self.users_bias = nn.Embedding(n_users, 1)
-        self.items_bias = nn.Embedding(n_items, 1)
+        self.items_vectors = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0] * n_factors] * n_items)))
+        self.users_vectors = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0] * n_factors] * n_users)))
+        self.users_bias = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0] * 1] * n_users)))
+        self.items_bias = nn.Embedding.from_pretrained(torch.from_numpy(np.array([[0] * 1] * n_items)))
+        # self.items_vectors = nn.Embedding(n_items, n_factors)
+        # self.users_vectors = nn.Embedding(n_users, n_factors)
+        # self.users_bias = nn.Embedding(n_users, 1)
+        # self.items_bias = nn.Embedding(n_items, 1)
 
     def forward(self, user_id, item_id):
         feat_user = self.users_vectors(user_id)
@@ -30,8 +33,8 @@ def read_original_data(filename: str):
 
     with open(filename, "r", encoding="utf-8") as txt_file:
         for idx, line in enumerate(txt_file):
-            # if idx > 5000:
-            #     break
+            if idx > 50:
+                break
             user_id, item_id, rating, times = line.strip().split('\t')
             user_id = int(user_id)
             item_id = int(item_id)
