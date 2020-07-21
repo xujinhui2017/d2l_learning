@@ -14,10 +14,10 @@ class MatrixFactorization(torch.nn.Module):
         #                                                )
         # print(self.items_bias)
         # print(nn.Embedding(n_items, 1))
-        self.items_vectors = nn.Embedding(n_items, n_factors, max_norm=1)
-        self.users_vectors = nn.Embedding(n_users, n_factors, max_norm=1)
-        self.users_bias = nn.Embedding(n_users, 1, max_norm=1)
-        self.items_bias = nn.Embedding(n_items, 1, max_norm=1)
+        self.items_vectors = nn.Embedding(n_items, n_factors)
+        self.users_vectors = nn.Embedding(n_users, n_factors)
+        self.users_bias = nn.Embedding(n_users, 1)
+        self.items_bias = nn.Embedding(n_items, 1)
 
     def forward(self, user_id, item_id):
         feat_user = self.users_vectors(user_id)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     model = MatrixFactorization(n_items=max_min_item[1], n_users=max_min_user[1], n_factors=300)
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.05, weight_decay=0.01)
-    epochs = 50
+    epochs = 100
     for epoch in range(epochs):
         for param_group in optimizer.param_groups:
             if epoch < 5:
@@ -88,8 +88,10 @@ if __name__ == "__main__":
                 param_group["lr"] = 0.05
             elif epoch < 30:
                 param_group["lr"] = 0.01
-            else:
+            elif epoch < 60:
                 param_group["lr"] = 0.002
+            else:
+                param_group["lr"] = 0.0005
         loss = 0
         for idx, element in enumerate(train_data):
             if idx > 0 and idx % 5000 == 0:
