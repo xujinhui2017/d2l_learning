@@ -24,7 +24,9 @@ class MatrixFactorization(torch.nn.Module):
         feat_item = self.items_vectors(item_id)
         bias_user = self.users_bias(user_id)
         bias_item = self.items_bias(item_id)
+        # -1 determined by last dimension
         result = (feat_user * feat_item).sum(-1) + bias_item.sum(-1) + bias_user.sum(-1)
+        # I choose to add relu since it will be better than 0 
         return result
 
 
@@ -76,11 +78,13 @@ if __name__ == "__main__":
     train_data, test_data, max_min_user, max_min_item = read_original_data(filename="data/u.data")
 
     # train
+    #你的factor 好多啊
     model = MatrixFactorization(n_items=max_min_item[1], n_users=max_min_user[1], n_factors=300)
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.05, weight_decay=0.01)
     epochs = 100
     for epoch in range(epochs):
+        #我们initialization 不一样 所以这一步不一样， 按道理adam会自己adjust lr
         for param_group in optimizer.param_groups:
             if epoch < 5:
                 param_group["lr"] = 0.1

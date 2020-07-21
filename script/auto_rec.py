@@ -9,7 +9,9 @@ class AutoRec(torch.nn.Module):
         self.encoder = nn.Sequential(
             nn.Linear(n_users, 50),
             nn.Sigmoid(),  # 激活函数
-            nn.Dropout(0.2),
+            # Why use 2 dropout 
+            nn.Dropout(0.2), 
+            #Why use decoder 
             nn.Linear(50, n_users),
             nn.Dropout(0.2),
             nn.Sigmoid()
@@ -102,10 +104,13 @@ if __name__ == "__main__":
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.002, weight_decay=0.01)
     epochs = 100
+    
+    
     for i in range(epochs):
         loss = 0
         for train_vector in train_matrix:
             prediction = model.forward(torch.FloatTensor([train_vector]), is_train=1)
+            #这样update 会慢一点 你是一个epoch update一次， 就没必要写成forloop 可以直接一起
             loss += loss_fn(torch.FloatTensor([train_vector]), prediction)
             # for params in model.parameters():
             #     loss_local += 0.01 * torch.norm(params, 1)
