@@ -108,7 +108,7 @@ def write_format(target_list: list):
 
 
 def evaluate_auc():
-    auc = 0
+    test_auc = 0
     for user_id_local in test_data:
         test_pos_item = test_data[user_id_local]["pos"]
         test_neg_item = test_data[user_id_local]["neg"]
@@ -118,9 +118,19 @@ def evaluate_auc():
             pos_score_local = model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))
         for item_id_local in test_neg_item:
             neg_score_local += [model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
-        auc += np.average([pos_score_local > i for i in neg_score_local])
-    auc = auc / len(train_data)
-    print("test_AUC:", auc)
+        test_auc += np.average([pos_score_local > i for i in neg_score_local])
+    for user_id_local in test_data:
+        test_pos_item = test_data[user_id_local]["pos"]
+        test_neg_item = test_data[user_id_local]["neg"]
+        neg_score_local = []
+        pos_score_local = []
+        for item_id_local in test_pos_item:
+            pos_score_local = model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))
+        for item_id_local in test_neg_item:
+            neg_score_local += [model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
+        test_auc += np.average([pos_score_local > i for i in neg_score_local])
+    test_auc = test_auc / len(test_data)
+    print("test_AUC:", test_auc)
 
 
 if __name__ == "__main__":
@@ -129,10 +139,21 @@ if __name__ == "__main__":
     max_item_ids = max_min_item[1]
     print(max_min_user, max_min_item)
     model = NeuMF(n_users=max_user_ids, n_items=max_item_ids, n_factors=10, nums_hiddens=[10, 10])
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.002, weight_decay=0.01)
-    epochs = 50
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.02, weight_decay=0.01)
+    epochs = 100
     
     for epoch in range(epochs):
+        for param_group in optimizer.param_groups:
+            if epoch < 10:
+                param_group["lr"] = 0.1
+            elif epoch < 30:
+                param_group["lr"] = 0.02
+            elif epoch < 50:
+                param_group["lr"] = 0.01
+            elif epoch < 80:
+                param_group["lr"] = 0.005
+            else:
+                param_group["lr"] = 0.002
         loss = 0
         loss_count = 0
         for idx, user_id in enumerate(train_data):
