@@ -14,10 +14,6 @@ class NeuMF(torch.nn.Module):
         torch.nn.init.normal_(self.items_mf.weight, 0.1)
         torch.nn.init.normal_(self.users_neu.weight, 0.1)
         torch.nn.init.normal_(self.items_neu.weight, 0.1)
-        self.users_mf.require_grad = True
-        self.items_mf.require_grad = True
-        self.users_neu.require_grad = True
-        self.users_neu.require_grad = True
 
         self.mlp = nn.Sequential()
         for idx, nums_hidden in enumerate(nums_hiddens):
@@ -97,7 +93,7 @@ def bpr_loss(positive, negative):
     return loss
 
 
-class Loss(torch.nn.Module):
+class Loss(torch.nn.MSELoss):
     def __init__(self):
         super().__init__()
 
