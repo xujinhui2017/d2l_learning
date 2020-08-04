@@ -110,12 +110,6 @@ if __name__ == "__main__":
         loss = 0
         loss_count = 0
         for idx, user_id in enumerate(train_data):
-            if loss_count > 0 and loss_count % 1000 == 0:
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-                print(epoch, idx, loss)
-                loss = 0
             pos_info = train_data[user_id]["pos"]
             neg_info = train_data[user_id]["neg"]
             pos_score = []
@@ -128,7 +122,13 @@ if __name__ == "__main__":
                 
                 loss += bpr_loss(positive=pos_score_single, negative=neg_score_single)
                 loss_count += 1
-                print(loss_count)
+                
+                if loss_count > 0 and loss_count % 1000 == 0:
+                    print(epoch, loss_count, loss)
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
+                    loss = 0
 
         optimizer.zero_grad()
 
@@ -137,5 +137,5 @@ if __name__ == "__main__":
 
         # update weights
         optimizer.step()
-        print(epoch, loss)
+        print(epoch, loss_count, loss)
     pass
