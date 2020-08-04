@@ -122,15 +122,15 @@ if __name__ == "__main__":
             pos_score = []
             neg_score = []
             for item_id in pos_info:
-                score = model.forward(torch.LongTensor([user_id - 1]), torch.LongTensor([item_id - 1]))
-                pos_score += [score] * len(neg_info)
+                pos_score_single = model.forward(torch.LongTensor([user_id - 1]), torch.LongTensor([item_id - 1]))
+                neg_idx = np.random.randint(0, len(neg_info) - 1)
+                neg_item_id = torch.LongTensor([neg_info[neg_idx] - 1])
+                neg_score_single = model.forward(torch.LongTensor([user_id - 1]), neg_item_id)
+                
+                pos_score += [pos_score_single]
+                neg_score += [neg_score_single]
             pos_score = torch.FloatTensor(pos_score)
-            neg_score = torch.FloatTensor(pos_score.size())
-            for neg_idx, item_id in enumerate(neg_info):
-                # print(user_id, item_id)
-                score = model.forward(torch.LongTensor([user_id - 1]), torch.LongTensor([item_id - 1]))
-                for pos_idx in range(len(pos_info)):
-                    neg_score[pos_idx * len(neg_info) + neg_idx] = score
+            neg_score = torch.FloatTensor(neg_score)
 
             loss += bpr_loss(positive=pos_score, negative=neg_score)
 
