@@ -10,10 +10,10 @@ class NeuMF(torch.nn.Module):
         self.users_mf = nn.Embedding(n_users, n_factors)
         self.users_neu = nn.Embedding(n_users, n_factors)
         self.items_neu = nn.Embedding(n_items, n_factors)
-        # torch.nn.init.normal_(self.users_mf.weight, 0.1)
-        # torch.nn.init.normal_(self.items_mf.weight, 0.1)
-        # torch.nn.init.normal_(self.users_neu.weight, 0.1)
-        # torch.nn.init.normal_(self.items_neu.weight, 0.1)
+        torch.nn.init.normal_(self.users_mf.weight, 0.1)
+        torch.nn.init.normal_(self.items_mf.weight, 0.1)
+        torch.nn.init.normal_(self.users_neu.weight, 0.1)
+        torch.nn.init.normal_(self.items_neu.weight, 0.1)
 
         self.mlp = nn.Sequential()
         for idx, nums_hidden in enumerate(nums_hiddens):
@@ -33,9 +33,11 @@ class NeuMF(torch.nn.Module):
         item_neu = self.items_neu(item_id)
         gmf = user_mf * item_mf
         input_vector = torch.cat((user_neu, item_neu), 1)
+        input_vector.requires_grad = True
         mlp = self.mlp(input_vector)
-        combine_result = torch.cat((gmf, mlp), 1).sum(-1)
-        return combine_result
+        combine_result = torch.cat((gmf, mlp), 1)
+        combine_result.requires_grad = True
+        return combine_result.sum(-1)
 
 
 def read_original_data(filename: str):
