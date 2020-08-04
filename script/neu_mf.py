@@ -105,10 +105,7 @@ if __name__ == "__main__":
     model = NeuMF(n_users=max_user_ids, n_items=max_item_ids, n_factors=10, nums_hiddens=[10, 10])
     optimizer = torch.optim.Adam(model.parameters(), lr=0.002, weight_decay=0.01)
     epochs = 2
-    count = 0
-    for user in train_data:
-        count += len(train_data[user]["pos"])
-    print(count)
+    
     for epoch in range(epochs):
         loss = 0
         loss_count = 0
@@ -129,14 +126,9 @@ if __name__ == "__main__":
                 neg_item_id = torch.LongTensor([neg_info[neg_idx] - 1])
                 neg_score_single = model.forward(torch.LongTensor([user_id - 1]), neg_item_id)
                 
-            #     pos_score += [pos_score_single]
-            #     neg_score += [neg_score_single]
-            #
-            # pos_score = torch.FloatTensor(pos_score)
-            # neg_score = torch.FloatTensor(neg_score)
-
                 loss += bpr_loss(positive=pos_score_single, negative=neg_score_single)
                 loss_count += 1
+                print(loss_count)
 
         optimizer.zero_grad()
 
