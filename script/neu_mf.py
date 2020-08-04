@@ -97,6 +97,16 @@ def bpr_loss(positive, negative):
     return loss
 
 
+class Loss(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def bpr_loss(self, positive, negative):
+        distances = positive - negative
+        loss = -torch.log(torch.sigmoid(distances)).sum(-1)
+        return loss
+
+
 def write_format(target_list: list):
     return "\t".join([str(i) for i in target_list]) + "\n"
 
@@ -107,7 +117,7 @@ if __name__ == "__main__":
     max_item_ids = max_min_item[1]
     print(max_min_user, max_min_item)
     model = NeuMF(n_users=max_user_ids, n_items=max_item_ids, n_factors=10, nums_hiddens=[10, 10])
-    loss_fn = nn.MSELoss()
+    loss_fn = Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.002, weight_decay=0.01)
     epochs = 2
 
@@ -136,7 +146,7 @@ if __name__ == "__main__":
                 for pos_idx in range(len(pos_info)):
                     neg_score[pos_idx * len(neg_info) + neg_idx] = score
 
-            loss += bpr_loss(positive=torch.FloatTensor(pos_score), negative=torch.FloatTensor(neg_score))
+            loss += loss_fn.bpr_loss(positive=torch.FloatTensor(pos_score), negative=torch.FloatTensor(neg_score))
 
         optimizer.zero_grad()
 
