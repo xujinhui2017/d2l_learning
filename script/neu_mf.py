@@ -103,7 +103,6 @@ if __name__ == "__main__":
     max_item_ids = max_min_item[1]
     print(max_min_user, max_min_item)
     model = NeuMF(n_users=max_user_ids, n_items=max_item_ids, n_factors=10, nums_hiddens=[10, 10])
-    loss_fn = Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.002, weight_decay=0.01)
     epochs = 2
 
@@ -133,7 +132,7 @@ if __name__ == "__main__":
                 for pos_idx in range(len(pos_info)):
                     neg_score[pos_idx * len(neg_info) + neg_idx] = score
 
-            loss += loss_fn.bpr_loss(positive=pos_score, negative=neg_score)
+            loss += bpr_loss(positive=pos_score, negative=neg_score)
 
         optimizer.zero_grad()
 
