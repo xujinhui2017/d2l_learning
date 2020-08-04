@@ -89,18 +89,8 @@ def read_original_data(filename: str):
 
 def bpr_loss(positive, negative):
     distances = positive - negative
-    loss = -torch.log(torch.sigmoid(distances)).sum(-1)
-    return loss
-
-
-class Loss(torch.nn.MSELoss):
-    def __init__(self):
-        super().__init__()
-
-    def bpr_loss(self, positive, negative):
-        distances = positive - negative
-        loss = -torch.log(torch.sigmoid(distances)).sum(-1)
-        return loss
+    loss_local = -torch.log(torch.sigmoid(distances)).sum(-1)
+    return loss_local
 
 
 def write_format(target_list: list):
@@ -143,7 +133,7 @@ if __name__ == "__main__":
                 for pos_idx in range(len(pos_info)):
                     neg_score[pos_idx * len(neg_info) + neg_idx] = score
 
-            loss += loss_fn.bpr_loss(positive=pos_score, negative=torch.FloatTensor(neg_score))
+            loss += loss_fn.bpr_loss(positive=pos_score, negative=neg_score)
 
         optimizer.zero_grad()
 
