@@ -129,7 +129,7 @@ if __name__ == "__main__":
     print(max_min_user, max_min_item)
     model = NeuMF(n_users=max_user_ids, n_items=max_item_ids, n_factors=10, nums_hiddens=[10, 10])
     optimizer = torch.optim.Adam(model.parameters(), lr=0.02, weight_decay=0.01)
-    epochs = 100
+    epochs = 500
     
     for epoch in range(epochs):
         for param_group in optimizer.param_groups:
@@ -141,8 +141,10 @@ if __name__ == "__main__":
                 param_group["lr"] = 0.01
             elif epoch < 80:
                 param_group["lr"] = 0.005
-            else:
+            elif epoch < 150:
                 param_group["lr"] = 0.002
+            else:
+                param_group["lr"] = 0.0005
         loss = 0
         loss_count = 0
         for idx, user_id in enumerate(train_data):
