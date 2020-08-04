@@ -119,17 +119,6 @@ def evaluate_auc():
         for item_id_local in test_neg_item:
             neg_score_local += [model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
         test_auc += np.average([pos_score_local > i for i in neg_score_local])
-    for user_id_local in test_data:
-        test_pos_item = test_data[user_id_local]["pos"]
-        test_neg_item = test_data[user_id_local]["neg"]
-        neg_score_local = []
-        pos_score_local = []
-        for item_id_local in test_pos_item:
-            pos_score_local = model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))
-        for item_id_local in test_neg_item:
-            neg_score_local += [model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
-        test_auc += np.average([pos_score_local > i for i in neg_score_local])
-    test_auc = test_auc / len(test_data)
     print("test_AUC:", test_auc)
 
 
