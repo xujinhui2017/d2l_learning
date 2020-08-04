@@ -108,9 +108,9 @@ if __name__ == "__main__":
 
     for epoch in range(epochs):
         loss = 0
-
+        loss_count = 0
         for idx, user_id in enumerate(train_data):
-            if idx > 0 and idx % 5 == 0:
+            if loss_count > 0 and loss_count % 1000 == 0:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -134,6 +134,7 @@ if __name__ == "__main__":
             # neg_score = torch.FloatTensor(neg_score)
 
                 loss += bpr_loss(positive=pos_score_single, negative=neg_score_single)
+                loss_count += 1
 
         optimizer.zero_grad()
 
