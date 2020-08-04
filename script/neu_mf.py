@@ -86,7 +86,7 @@ def read_original_data(filename: str):
         test_set = set([test_item] + np.random.choice(candidates, int(len(candidates) / 3), replace=False))
         test_dict[user_id] = {
             "pos": [test_item],
-            "neg": list(test_set - set(test_item))
+            "neg": list(test_set - {test_item})
         }
         pos_neg_train[user_id]["neg"] = list(set(candidates) - test_set)
 
