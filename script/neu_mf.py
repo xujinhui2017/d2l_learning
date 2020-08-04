@@ -81,10 +81,16 @@ def read_original_data(filename: str):
                 pos_neg_train[user_id]["pos"].append(item_id)
             else:
                 test_item = item_id
-                test_list.append((user_id, item_id, info[1]))
-        pos_neg_train[user_id]["neg"] = list(all_items - set(pos_neg_train[user_id]["pos"]) - {test_item})
+                
+        candidates = list(all_items - set(pos_neg_train[user_id]["pos"]) - {test_item})
+        test_set = set([test_item] + np.random.choice(candidates, int(len(candidates) / 3), replace=False))
+        test_dict[user_id] = {
+            "pos": [test_item],
+            "neg": list(test_set - set(test_item))
+        }
+        pos_neg_train[user_id]["neg"] = list(set(candidates) - test_set)
 
-    return pos_neg_train, test_list, [min_user_id, max_user_id], [min_item_id, max_item_id]
+    return pos_neg_train, test_dict, [min_user_id, max_user_id], [min_item_id, max_item_id]
 
 
 def bpr_loss(positive, negative):
@@ -97,6 +103,22 @@ def write_format(target_list: list):
     return "\t".join([str(i) for i in target_list]) + "\n"
 
 
+def evaluate_auc():
+    auc = 0
+    for user_id_local in test_data:
+        test_pos_item = test_data[user_id]["pos"]
+        test_neg_item = test_data[user_id]["neg"]
+        neg_score_local = []
+        pos_score_local = []
+        for item_id_local in test_pos_item:
+            pos_score_local = model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))
+        for item_id_local in test_neg_item:
+            neg_score_local += [model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
+        auc += np.average([pos_score_local > i for i in neg_score_local])
+    auc = auc / len(train_data)
+    print("test_AUC:", auc)
+
+
 if __name__ == "__main__":
     train_data, test_data, max_min_user, max_min_item = read_original_data(filename="data/u.data")
     max_user_ids = max_min_user[1]
@@ -104,7 +126,7 @@ if __name__ == "__main__":
     print(max_min_user, max_min_item)
     model = NeuMF(n_users=max_user_ids, n_items=max_item_ids, n_factors=10, nums_hiddens=[10, 10])
     optimizer = torch.optim.Adam(model.parameters(), lr=0.002, weight_decay=0.01)
-    epochs = 2
+    epochs = 50
     
     for epoch in range(epochs):
         loss = 0
@@ -138,4 +160,8 @@ if __name__ == "__main__":
         # update weights
         optimizer.step()
         print(epoch, loss_count, loss)
+        evaluate_auc()
+        
+    # evaluate
+    
     pass
