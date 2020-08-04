@@ -105,7 +105,10 @@ if __name__ == "__main__":
     model = NeuMF(n_users=max_user_ids, n_items=max_item_ids, n_factors=10, nums_hiddens=[10, 10])
     optimizer = torch.optim.Adam(model.parameters(), lr=0.002, weight_decay=0.01)
     epochs = 2
-
+    count = 0
+    for user in train_data:
+        count += len(train_data[user]["pos"])
+    print(count)
     for epoch in range(epochs):
         loss = 0
         loss_count = 0
@@ -116,7 +119,6 @@ if __name__ == "__main__":
                 optimizer.step()
                 print(epoch, idx, loss)
                 loss = 0
-            print(idx)
             pos_info = train_data[user_id]["pos"]
             neg_info = train_data[user_id]["neg"]
             pos_score = []
