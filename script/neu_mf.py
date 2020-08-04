@@ -198,3 +198,4 @@ if __name__ == "__main__":
         train(data_dict=train_data, model_local=model, batch_count=5000)
         evaluate_auc()
         evaluate_hit_k(data_dict=test_data, limit_k=[2, 5, 10])
+    pass
