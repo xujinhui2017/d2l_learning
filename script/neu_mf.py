@@ -89,7 +89,7 @@ def read_original_data(filename: str):
 
 def bpr_loss(positive, negative):
     distances = positive - negative
-    loss_local = -torch.log(torch.sigmoid(distances)).sum(-1)
+    loss_local = -torch.log(torch.sigmoid(distances))
     return loss_local
 
 
@@ -127,12 +127,13 @@ if __name__ == "__main__":
                 neg_item_id = torch.LongTensor([neg_info[neg_idx] - 1])
                 neg_score_single = model.forward(torch.LongTensor([user_id - 1]), neg_item_id)
                 
-                pos_score += [pos_score_single]
-                neg_score += [neg_score_single]
-            pos_score = torch.FloatTensor(pos_score)
-            neg_score = torch.FloatTensor(neg_score)
+            #     pos_score += [pos_score_single]
+            #     neg_score += [neg_score_single]
+            #
+            # pos_score = torch.FloatTensor(pos_score)
+            # neg_score = torch.FloatTensor(neg_score)
 
-            loss += bpr_loss(positive=pos_score, negative=neg_score)
+                loss += bpr_loss(positive=pos_score_single, negative=neg_score_single)
 
         optimizer.zero_grad()
 
