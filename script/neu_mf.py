@@ -119,8 +119,27 @@ def evaluate_auc():
         for item_id_local in test_neg_item:
             neg_score_local += [model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
         test_auc += np.average([pos_score_local > i for i in neg_score_local])
+    test_auc = test_auc / len(test_data)
     print("test_AUC:", test_auc)
 
+
+def evaluate_hit_k(data_dict: dict, limit_k: list):
+    hit_k = [0] * len(limit_k)
+    for user_id_local in data_dict:
+        test_pos_item = data_dict[user_id_local]["pos"]
+        test_neg_item = data_dict[user_id_local]["neg"]
+        neg_score_local = []
+        pos_score_local = []
+        for item_id_local in test_pos_item:
+            pos_score_local = model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))
+        for item_id_local in test_neg_item:
+            neg_score_local += [model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
+        for idx, limit_k_single in enumerate(limit_k):
+            hit_k[idx] += 1 if sum([pos_score_local < i for i in neg_score_local]) < limit_k_single else 0
+    hit_k = [i / len(data_dict) for i in hit_k]
+    for idx, hit_k_single in enumerate(hit_k):
+        print("test_hit_{}: {}".format(limit_k[idx], hit_k_single))
+        
 
 if __name__ == "__main__":
     train_data, test_data, max_min_user, max_min_item = read_original_data(filename="data/u.data")
@@ -177,6 +196,7 @@ if __name__ == "__main__":
         optimizer.step()
         print(epoch, loss_count, loss)
         evaluate_auc()
+        evaluate_hit_k(data_dict=test_data, limit_k=[2, 5, 10])
         
     # evaluate
     
