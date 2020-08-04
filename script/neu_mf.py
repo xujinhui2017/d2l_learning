@@ -32,9 +32,9 @@ class NeuMF(torch.nn.Module):
         user_neu = self.users_neu(user_id)
         item_neu = self.items_neu(item_id)
         gmf = user_mf * item_mf
-        input_vector = torch.FloatTensor(torch.cat((user_neu, item_neu), axis=1))
+        input_vector = torch.cat((user_neu, item_neu), 1)
         mlp = self.mlp(input_vector)
-        combine_result = torch.cat((gmf, mlp), axis=1).sum(-1)
+        combine_result = torch.cat((gmf, mlp), 1).sum(-1)
         return combine_result
 
 
@@ -142,6 +142,4 @@ if __name__ == "__main__":
         # update weights
         optimizer.step()
         print(epoch, loss)
-
-
     pass
