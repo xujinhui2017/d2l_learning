@@ -116,7 +116,7 @@ if __name__ == "__main__":
                 optimizer.step()
                 print(epoch, idx, loss)
                 loss = 0
-
+            print(idx)
             pos_info = train_data[user_id]["pos"]
             neg_info = train_data[user_id]["neg"]
             pos_score = []
