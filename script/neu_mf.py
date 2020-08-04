@@ -83,7 +83,11 @@ def read_original_data(filename: str):
                 test_item = item_id
                 
         candidates = list(all_items - set(pos_neg_train[user_id]["pos"]) - {test_item})
-        test_set = set([test_item] + np.random.choice(candidates, int(len(candidates) / 3), replace=False))
+        selected_num = min(max(int(len(candidates) / 20), 5), len(candidates))
+        selected_test = np.random.choice(candidates, selected_num, replace=False)
+        test_set = set([test_item] + list(selected_test))
+        # print(selected_test, max(selected_test))
+        # break
         test_dict[user_id] = {
             "pos": [test_item],
             "neg": list(test_set - {test_item})
@@ -106,8 +110,8 @@ def write_format(target_list: list):
 def evaluate_auc():
     auc = 0
     for user_id_local in test_data:
-        test_pos_item = test_data[user_id]["pos"]
-        test_neg_item = test_data[user_id]["neg"]
+        test_pos_item = test_data[user_id_local]["pos"]
+        test_neg_item = test_data[user_id_local]["neg"]
         neg_score_local = []
         pos_score_local = []
         for item_id_local in test_pos_item:
