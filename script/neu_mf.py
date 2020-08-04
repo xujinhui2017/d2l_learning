@@ -111,7 +111,7 @@ if __name__ == "__main__":
         loss = 0
 
         for idx, user_id in enumerate(train_data):
-            if idx > 0 and idx % 5000 == 0:
+            if idx > 0 and idx % 5 == 0:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
