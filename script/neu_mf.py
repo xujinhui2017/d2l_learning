@@ -10,10 +10,10 @@ class NeuMF(torch.nn.Module):
         self.users_mf = nn.Embedding(n_users, n_factors)
         self.users_neu = nn.Embedding(n_users, n_factors)
         self.items_neu = nn.Embedding(n_items, n_factors)
-        torch.nn.init.normal_(self.users_mf.weight, 0.1)
-        torch.nn.init.normal_(self.items_mf.weight, 0.1)
-        torch.nn.init.normal_(self.users_neu.weight, 0.1)
-        torch.nn.init.normal_(self.items_neu.weight, 0.1)
+        # torch.nn.init.normal_(self.users_mf.weight, 0.1)
+        # torch.nn.init.normal_(self.items_mf.weight, 0.1)
+        # torch.nn.init.normal_(self.users_neu.weight, 0.1)
+        # torch.nn.init.normal_(self.items_neu.weight, 0.1)
 
         self.mlp = nn.Sequential()
         for idx, nums_hidden in enumerate(nums_hiddens):
