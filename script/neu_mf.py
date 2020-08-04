@@ -41,7 +41,6 @@ class NeuMF(torch.nn.Module):
 def read_original_data(filename: str):
     train_dict = dict()
     test_dict = dict()
-    test_list = []
     max_user_id, min_user_id, max_item_id, min_item_id = [10] * 4
 
     with open(filename, "r", encoding="utf-8") as txt_file:
@@ -139,8 +138,40 @@ def evaluate_hit_k(data_dict: dict, limit_k: list):
     hit_k = [i / len(data_dict) for i in hit_k]
     for idx, hit_k_single in enumerate(hit_k):
         print("test_hit_{}: {}".format(limit_k[idx], hit_k_single))
-        
 
+
+def train(data_dict: dict, model_local,  batch_count: int):
+    loss = 0
+    loss_count = 0
+    for idx, user_id in enumerate(data_dict):
+        pos_info = data_dict[user_id]["pos"]
+        neg_info = data_dict[user_id]["neg"]
+        for item_id in pos_info:
+            pos_score_single = model_local.forward(torch.LongTensor([user_id - 1]), torch.LongTensor([item_id - 1]))
+            neg_idx = np.random.randint(0, len(neg_info) - 1)
+            neg_item_id = torch.LongTensor([neg_info[neg_idx] - 1])
+            neg_score_single = model_local.forward(torch.LongTensor([user_id - 1]), neg_item_id)
+            
+            loss += bpr_loss(positive=pos_score_single, negative=neg_score_single)
+            loss_count += 1
+            
+            if loss_count > 0 and loss_count % batch_count == 0:
+                print(epoch, loss_count, loss)
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                loss = 0
+    
+    optimizer.zero_grad()
+    
+    # backpropagate
+    loss.backward()
+    
+    # update weights
+    optimizer.step()
+    print(epoch, loss_count, loss)
+    
+    
 if __name__ == "__main__":
     train_data, test_data, max_min_user, max_min_item = read_original_data(filename="data/u.data")
     max_user_ids = max_min_user[1]
@@ -154,50 +185,16 @@ if __name__ == "__main__":
         for param_group in optimizer.param_groups:
             if epoch < 10:
                 param_group["lr"] = 0.1
-            elif epoch < 30:
+            elif epoch < 15:
                 param_group["lr"] = 0.02
-            elif epoch < 50:
+            elif epoch < 25:
                 param_group["lr"] = 0.01
-            elif epoch < 80:
+            elif epoch < 50:
                 param_group["lr"] = 0.005
-            elif epoch < 150:
+            elif epoch < 100:
                 param_group["lr"] = 0.002
             else:
                 param_group["lr"] = 0.0005
-        loss = 0
-        loss_count = 0
-        for idx, user_id in enumerate(train_data):
-            pos_info = train_data[user_id]["pos"]
-            neg_info = train_data[user_id]["neg"]
-            pos_score = []
-            neg_score = []
-            for item_id in pos_info:
-                pos_score_single = model.forward(torch.LongTensor([user_id - 1]), torch.LongTensor([item_id - 1]))
-                neg_idx = np.random.randint(0, len(neg_info) - 1)
-                neg_item_id = torch.LongTensor([neg_info[neg_idx] - 1])
-                neg_score_single = model.forward(torch.LongTensor([user_id - 1]), neg_item_id)
-                
-                loss += bpr_loss(positive=pos_score_single, negative=neg_score_single)
-                loss_count += 1
-                
-                if loss_count > 0 and loss_count % 5000 == 0:
-                    print(epoch, loss_count, loss)
-                    optimizer.zero_grad()
-                    loss.backward()
-                    optimizer.step()
-                    loss = 0
-
-        optimizer.zero_grad()
-
-        # backpropagate
-        loss.backward()
-
-        # update weights
-        optimizer.step()
-        print(epoch, loss_count, loss)
+        train(data_dict=train_data, model_local=model, batch_count=5000)
         evaluate_auc()
         evaluate_hit_k(data_dict=test_data, limit_k=[2, 5, 10])
-        
-    # evaluate
-    
-    pass
