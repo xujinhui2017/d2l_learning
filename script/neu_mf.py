@@ -145,7 +145,7 @@ if __name__ == "__main__":
                 loss += bpr_loss(positive=pos_score_single, negative=neg_score_single)
                 loss_count += 1
                 
-                if loss_count > 0 and loss_count % 1000 == 0:
+                if loss_count > 0 and loss_count % 5000 == 0:
                     print(epoch, loss_count, loss)
                     optimizer.zero_grad()
                     loss.backward()
