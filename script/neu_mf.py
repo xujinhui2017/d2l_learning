@@ -185,11 +185,11 @@ if __name__ == "__main__":
     lr = init_lr
     hit_k_limit_value = [2, 5, 10]
     for epoch in range(epochs):
-        print("learning rate: {}".format(lr))
         if len(auc_list) >= 5 and auc_list[-1] < auc_list[-3]:
             lr = lr * 0.5
             for param_group in optimizer.param_groups:
                 param_group["lr"] = lr
+        print("learning rate: {}".format(lr))
         
         train(data_dict=train_data, model_local=model, batch_count=1000)
         single_auc = evaluate_auc()
