@@ -119,7 +119,7 @@ def evaluate_auc():
             neg_score_local += [model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
         test_auc += np.average([pos_score_local > i for i in neg_score_local])
     test_auc = test_auc / len(test_data)
-    print("test_AUC:", test_auc)
+    return test_auc
 
 
 def evaluate_hit_k(data_dict: dict, limit_k: list):
@@ -136,8 +136,7 @@ def evaluate_hit_k(data_dict: dict, limit_k: list):
         for idx, limit_k_single in enumerate(limit_k):
             hit_k[idx] += 1 if sum([pos_score_local < i for i in neg_score_local]) < limit_k_single else 0
     hit_k = [i / len(data_dict) for i in hit_k]
-    for idx, hit_k_single in enumerate(hit_k):
-        print("test_hit_{}: {}".format(limit_k[idx], hit_k_single))
+    return hit_k
 
 
 def train(data_dict: dict, model_local,  batch_count: int):
@@ -178,24 +177,25 @@ if __name__ == "__main__":
     max_item_ids = max_min_item[1]
     print(max_min_user, max_min_item)
     model = NeuMF(n_users=max_user_ids, n_items=max_item_ids, n_factors=10, nums_hiddens=[10, 10])
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.02, weight_decay=0.01)
+    init_lr = 0.1
+    optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=0.01)
     epochs = 500
     
+    auc_list = []
+    lr = init_lr
+    hit_k_limit_value = [2, 5, 10]
     for epoch in range(epochs):
+        print(lr)
+        if len(auc_list) >= 5 and auc_list[-1] < auc_list[-3]:
+            lr = lr * 0.95
         for param_group in optimizer.param_groups:
-            if epoch < 5:
-                param_group["lr"] = 0.1
-            elif epoch < 15:
-                param_group["lr"] = 0.02
-            elif epoch < 25:
-                param_group["lr"] = 0.01
-            elif epoch < 35:
-                param_group["lr"] = 0.005
-            elif epoch < 50:
-                param_group["lr"] = 0.002
-            else:
-                param_group["lr"] = 0.002 * 0.95 ** (epoch // 10)
+            param_group["lr"] = lr
+        
         train(data_dict=train_data, model_local=model, batch_count=5000)
-        evaluate_auc()
-        evaluate_hit_k(data_dict=test_data, limit_k=[2, 5, 10])
+        single_auc = evaluate_auc()
+        auc_list.append(single_auc)
+        hit_k_value = evaluate_hit_k(data_dict=test_data, limit_k=hit_k_limit_value)
+        print("test_AUC:", single_auc)
+        for idx, hit_k_single in enumerate(hit_k_value):
+            print("test_hit_{}: {}".format(hit_k_limit_value[idx], hit_k_single))
     pass
