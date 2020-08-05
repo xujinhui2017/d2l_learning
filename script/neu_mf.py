@@ -191,7 +191,7 @@ if __name__ == "__main__":
             for param_group in optimizer.param_groups:
                 param_group["lr"] = lr
         
-        train(data_dict=train_data, model_local=model, batch_count=5000)
+        train(data_dict=train_data, model_local=model, batch_count=1000)
         single_auc = evaluate_auc()
         auc_list.append(single_auc)
         hit_k_value = evaluate_hit_k(data_dict=test_data, limit_k=hit_k_limit_value)
