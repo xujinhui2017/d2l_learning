@@ -185,7 +185,7 @@ if __name__ == "__main__":
     lr = init_lr
     hit_k_limit_value = [2, 5, 10]
     for epoch in range(epochs):
-        print(lr)
+        print("learning rate: {}".format(lr))
         if len(auc_list) >= 5 and auc_list[-1] < auc_list[-3]:
             lr = lr * 0.95
         for param_group in optimizer.param_groups:
