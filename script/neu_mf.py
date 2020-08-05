@@ -188,8 +188,8 @@ if __name__ == "__main__":
         print("learning rate: {}".format(lr))
         if len(auc_list) >= 5 and auc_list[-1] < auc_list[-3]:
             lr = lr * 0.95
-        for param_group in optimizer.param_groups:
-            param_group["lr"] = lr
+            for param_group in optimizer.param_groups:
+                param_group["lr"] = lr
         
         train(data_dict=train_data, model_local=model, batch_count=5000)
         single_auc = evaluate_auc()
