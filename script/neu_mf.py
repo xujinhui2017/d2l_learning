@@ -183,18 +183,18 @@ if __name__ == "__main__":
     
     for epoch in range(epochs):
         for param_group in optimizer.param_groups:
-            if epoch < 10:
+            if epoch < 5:
                 param_group["lr"] = 0.1
             elif epoch < 15:
                 param_group["lr"] = 0.02
             elif epoch < 25:
                 param_group["lr"] = 0.01
-            elif epoch < 50:
+            elif epoch < 35:
                 param_group["lr"] = 0.005
-            elif epoch < 100:
+            elif epoch < 50:
                 param_group["lr"] = 0.002
             else:
-                param_group["lr"] = 0.0005
+                param_group["lr"] = 0.002 * 0.95 ** (epoch // 10)
         train(data_dict=train_data, model_local=model, batch_count=5000)
         evaluate_auc()
         evaluate_hit_k(data_dict=test_data, limit_k=[2, 5, 10])
