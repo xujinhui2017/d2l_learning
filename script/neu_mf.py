@@ -187,7 +187,7 @@ if __name__ == "__main__":
     for epoch in range(epochs):
         print("learning rate: {}".format(lr))
         if len(auc_list) >= 5 and auc_list[-1] < auc_list[-3]:
-            lr = lr * 0.95
+            lr = lr * 0.5
             for param_group in optimizer.param_groups:
                 param_group["lr"] = lr
         
