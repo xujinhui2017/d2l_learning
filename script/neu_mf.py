@@ -18,7 +18,9 @@ class NeuMF(torch.nn.Module):
         self.mlp = nn.Sequential()
         for idx, nums_hidden in enumerate(nums_hiddens):
             if idx == 0:
+                #format is very good学习了
                 self.mlp.add_module("linear_{}".format(idx), nn.Linear(2 * n_factors, nums_hidden))
+                #Why do you add sigmoid, the out put is a score
                 self.mlp.add_module("activation_{}".format(idx), nn.Sigmoid())
                 self.mlp.add_module("dropout_{}".format(idx), nn.Dropout(0.2))
             else:
@@ -106,6 +108,7 @@ def write_format(target_list: list):
     return "\t".join([str(i) for i in target_list]) + "\n"
 
 
+#写的好 学习了
 def evaluate_auc():
     test_auc = 0
     for user_id_local in test_data:
@@ -121,7 +124,7 @@ def evaluate_auc():
     test_auc = test_auc / len(test_data)
     return test_auc
 
-
+#向优秀看齐 写的好
 def evaluate_hit_k(data_dict: dict, limit_k: list):
     hit_k = [0] * len(limit_k)
     for user_id_local in data_dict:
