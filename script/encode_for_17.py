@@ -37,7 +37,7 @@ def run(original_file: str, result_filename: str):
 
 
 def write_format(target_list: list):
-    return "\t".join([str(i) for  i in target_list]) + "\n"
+    return "\t".join([str(i) for i in target_list]) + "\n"
     
 
 def write_encode_file(filename: str, target_dict: dict):
