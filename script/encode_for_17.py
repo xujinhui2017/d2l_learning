@@ -5,7 +5,15 @@ import time
 def run(original_file: str, result_filename: str):
     stud_encode_dict = dict()
     content_encode_dict = dict()
+    stats = dict()
     stud_current_encode, content_current_encode = [1, 1]
+    # with open(original_file, "r", encoding="utf-8") as txt_file:
+    #     for line in txt_file:
+    #         student_id, content_type, content_id, status, raw_time = line.strip().split("\t")
+    #         if student_id not in stats:
+    #             stats[student_id] = 1
+    #         else:
+    
     with open(original_file, "r", encoding="utf-8") as txt_file, open(result_filename, "w", encoding="utf-8") as result_file:
         for line in txt_file:
             student_id, content_type, content_id, status, raw_time = line.strip().split("\t")
@@ -22,8 +30,8 @@ def run(original_file: str, result_filename: str):
             
             time_array = time.strptime(raw_time, "%Y-%m-%d %H:%M:%S")
             time_stamp = int(time.mktime(time_array))
-            
-            result_file.write(write_format(target_list=[stud_encode_dict[student_id], content_encode_dict[content_id],
+            if rank == 1:
+                result_file.write(write_format(target_list=[stud_encode_dict[student_id], content_encode_dict[content_id],
                                                         rank, time_stamp]))
     return stud_encode_dict, content_encode_dict
 
