@@ -21,7 +21,7 @@ def run(original_file: str, result_filename: str):
     with open(original_file, "r", encoding="utf-8") as txt_file, open(result_filename, "w", encoding="utf-8") as result_file:
         for line in txt_file:
             student_id, content_type, content_id, status, raw_time = line.strip().split("\t")
-            if status[student_id][0] < 20 or status[student_id][1] < 10:
+            if stats[student_id][0] < 20 or stats[student_id][1] < 10:
                 continue
             if student_id not in stud_encode_dict:
                 stud_encode_dict[student_id] = stud_current_encode
