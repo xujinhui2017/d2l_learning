@@ -16,7 +16,7 @@ def run(original_file: str, result_filename: str):
                 rank = 0
             if student_id not in stats:
                 stats[student_id] = [0, 0]
-            stats[student_id][status] += 1
+            stats[student_id][rank] += 1
     
     with open(original_file, "r", encoding="utf-8") as txt_file, open(result_filename, "w", encoding="utf-8") as result_file:
         for line in txt_file:
