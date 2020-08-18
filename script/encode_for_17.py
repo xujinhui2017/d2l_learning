@@ -10,7 +10,10 @@ def run(original_file: str, result_filename: str):
     with open(original_file, "r", encoding="utf-8") as txt_file:
         for line in txt_file:
             student_id, content_type, content_id, status, raw_time = line.strip().split("\t")
-            status = int(status)
+            if "Click" in status:
+                rank = 1
+            else:
+                rank = 0
             if student_id not in stats:
                 stats[student_id] = [0, 0]
             stats[student_id][status] += 1
