@@ -195,7 +195,7 @@ if __name__ == "__main__":
     lr = init_lr
     hit_k_limit_value = [2, 5, 10]
     for epoch in range(epochs):
-        if len(auc_list) >= 5 and auc_list[-1] < auc_list[-3] and auc_list[-1] < auc_list[-2]:
+        if len(auc_list) >= 3 and auc_list[-1] < auc_list[-2]:
             lr = lr * 0.5
             for param_group in optimizer.param_groups:
                 param_group["lr"] = lr
