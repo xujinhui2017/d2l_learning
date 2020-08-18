@@ -99,7 +99,6 @@ def read_original_data(filename: str):
             "neg": list(test_set - {test_item})
         }
         pos_neg_train[user_id]["neg"] = list(set(candidates) - test_set)
-    
     return pos_neg_train, test_dict, [min_user_id, max_user_id], [min_item_id, max_item_id]
 
 
