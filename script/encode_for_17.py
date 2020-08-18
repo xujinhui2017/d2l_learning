@@ -30,8 +30,7 @@ def run(original_file: str, result_filename: str):
             
             time_array = time.strptime(raw_time, "%Y-%m-%d %H:%M:%S")
             time_stamp = int(time.mktime(time_array))
-            if rank == 1:
-                result_file.write(write_format(target_list=[stud_encode_dict[student_id], content_encode_dict[content_id],
+            result_file.write(write_format(target_list=[stud_encode_dict[student_id], content_encode_dict[content_id],
                                                         rank, time_stamp]))
     return stud_encode_dict, content_encode_dict
 
