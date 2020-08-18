@@ -89,7 +89,7 @@ def read_original_data(filename: str):
                 test_item = item_id
         
         # candidates = list(all_items - set(pos_neg_train[user_id]["pos"]) - {test_item})
-        selected_num = min(max(int(len(candidates) / 20), 5), len(candidates))
+        selected_num = min(max(int(len(candidates) / 20), 10), len(candidates))
         selected_test = np.random.choice(candidates, selected_num, replace=False)
         test_set = set([test_item] + list(selected_test))
         # print(selected_test, max(selected_test))
