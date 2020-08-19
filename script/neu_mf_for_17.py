@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
+import sys
 
 
 class NeuMF(torch.nn.Module):
@@ -65,8 +66,8 @@ def read_original_data(filename: str):
                 min_item_id = item_id
             
             train_dict.setdefault(user_id, []).append((item_id, rating))
-            if rating > 0 and (user_id not in test_dict or times > test_dict[user_id][-1]):
-                test_dict[user_id] = (item_id, rating, times)
+            # if rating > 0 and (user_id not in test_dict or times > test_dict[user_id][-1]):
+            #     test_dict[user_id] = (item_id, rating, times)
     
     pos_neg_train = dict()
     # all_items = set([i for i in range(1, max_item_id + 1)])
@@ -76,30 +77,29 @@ def read_original_data(filename: str):
             "pos": [],
             "neg": []
         }
-        test_item = 0
         for info in train_dict[user_id]:
             item_id, rating = info
-            if item_id != test_dict[user_id][0]:
-                if rating > 0:
-                    pos_neg_train[user_id]["pos"].append(item_id)
-                else:
-                    candidates.append(item_id)
-                    
+            # if item_id != test_dict[user_id][0]:
+            if rating > 0:
+                pos_neg_train[user_id]["pos"].append(item_id)
             else:
-                test_item = item_id
+                candidates.append(item_id)
+                    
+            # else:
+            #     test_item = item_id
         
         # candidates = list(all_items - set(pos_neg_train[user_id]["pos"]) - {test_item})
-        selected_num = min(max(int(len(candidates) / 20), 10), len(candidates))
-        selected_test = np.random.choice(candidates, selected_num, replace=False)
-        test_set = set([test_item] + list(selected_test))
+        # selected_num = min(max(int(len(candidates) / 20), 10), len(candidates))
+        # selected_test = np.random.choice(candidates, selected_num, replace=False)
+        # test_set = set([test_item] + list(selected_test))
         # print(selected_test, max(selected_test))
         # break
-        test_dict[user_id] = {
-            "pos": [test_item],
-            "neg": list(test_set - {test_item})
-        }
-        pos_neg_train[user_id]["neg"] = list(set(candidates) - test_set)
-    return pos_neg_train, test_dict, [min_user_id, max_user_id], [min_item_id, max_item_id]
+        # test_dict[user_id] = {
+        #     "pos": [test_item],
+        #     "neg": list(test_set - {test_item})
+        # }
+        pos_neg_train[user_id]["neg"] = candidates
+    return pos_neg_train, [min_user_id, max_user_id], [min_item_id, max_item_id]
 
 
 def bpr_loss(positive, negative):
@@ -182,7 +182,9 @@ def train(data_dict: dict, model_local, batch_count: int):
 
 
 if __name__ == "__main__":
-    train_data, test_data, max_min_user, max_min_item = read_original_data(filename="ctr_data.formal_new")
+    train_filename, test_filename = sys.argv[1:]
+    train_data, max_min_user, max_min_item = read_original_data(filename="ctr_data.formal_new")
+    test_data, _, _ = read_original_data(filename="ctr_data.formal_new")
     max_user_ids = max_min_user[1]
     max_item_ids = max_min_item[1]
     print(max_min_user, max_min_item)
