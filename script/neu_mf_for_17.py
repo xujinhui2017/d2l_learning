@@ -117,10 +117,10 @@ def evaluate_auc():
     count = 0
     for user_id_local in test_data:
         test_pos_item = test_data[user_id_local]["pos"]
-        if not test_pos_item:
+        test_neg_item = test_data[user_id_local]["neg"]
+        if not test_pos_item or not test_neg_item:
             continue
         count += 1
-        test_neg_item = test_data[user_id_local]["neg"]
         neg_score_local = []
         pos_score_local = []
         for item_id_local in test_pos_item:
@@ -136,20 +136,24 @@ def evaluate_auc():
 
 def evaluate_hit_k(data_dict: dict, limit_k: list):
     hit_k = [0] * len(limit_k)
+    count = 0
     for user_id_local in data_dict:
         test_pos_item = data_dict[user_id_local]["pos"]
         test_neg_item = data_dict[user_id_local]["neg"]
+        if not test_pos_item or not test_neg_item:
+            continue
+        count += 1
         neg_score_local = []
         pos_score_local = []
         for item_id_local in test_pos_item:
-            pos_score_local = model.forward(torch.LongTensor([user_id_local - 1]),
+            pos_score_local += model.forward(torch.LongTensor([user_id_local - 1]),
                                             torch.LongTensor([item_id_local - 1]))
         for item_id_local in test_neg_item:
             neg_score_local += [
                 model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
         for idx, limit_k_single in enumerate(limit_k):
-            hit_k[idx] += 1 if sum([pos_score_local < i for i in neg_score_local]) < limit_k_single else 0
-    hit_k = [i / len(data_dict) for i in hit_k]
+            hit_k[idx] += 1 if sum([max(pos_score_local) < i for i in neg_score_local]) < limit_k_single else 0
+    hit_k = [i / count for i in hit_k]
     return hit_k
 
 
