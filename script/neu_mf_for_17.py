@@ -114,19 +114,23 @@ def write_format(target_list: list):
 
 def evaluate_auc():
     test_auc = 0
+    count = 0
     for user_id_local in test_data:
         test_pos_item = test_data[user_id_local]["pos"]
+        if not test_pos_item:
+            continue
+        count += 1
         test_neg_item = test_data[user_id_local]["neg"]
         neg_score_local = []
         pos_score_local = []
         for item_id_local in test_pos_item:
-            pos_score_local = model.forward(torch.LongTensor([user_id_local - 1]),
+            pos_score_local += model.forward(torch.LongTensor([user_id_local - 1]),
                                             torch.LongTensor([item_id_local - 1]))
         for item_id_local in test_neg_item:
             neg_score_local += [
                 model.forward(torch.LongTensor([user_id_local - 1]), torch.LongTensor([item_id_local - 1]))]
-        test_auc += np.average([pos_score_local > i for i in neg_score_local])
-    test_auc = test_auc / len(test_data)
+        test_auc += np.average([j > i for i in neg_score_local for j in pos_score_local])
+    test_auc = test_auc / count
     return test_auc
 
 
