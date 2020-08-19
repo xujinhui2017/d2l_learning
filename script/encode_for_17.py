@@ -62,7 +62,7 @@ def read_encode_file(filename: str):
 
 
 def test_run(original_file: str, result_filename: str, stud_encode_dict: dict, content_encode_dict: dict):
-    with open(original_filename, "r", encoding="utf-8") as txt_file, open(result_filename, "w", encoding="utf-8") as result_file:
+    with open(original_file, "r", encoding="utf-8") as txt_file, open(result_filename, "w", encoding="utf-8") as result_file:
         for line in txt_file:
             student_id, content_type, content_id, status, raw_time = line.strip().split("\t")
             if student_id not in stud_encode_dict or content_id not in content_encode_dict:

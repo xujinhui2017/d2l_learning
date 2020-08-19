@@ -183,8 +183,8 @@ def train(data_dict: dict, model_local, batch_count: int):
 
 if __name__ == "__main__":
     train_filename, test_filename = sys.argv[1:]
-    train_data, max_min_user, max_min_item = read_original_data(filename="ctr_data.formal_new")
-    test_data, _, _ = read_original_data(filename="ctr_data.formal_new")
+    train_data, max_min_user, max_min_item = read_original_data(filename=train_filename)
+    test_data, _, _ = read_original_data(filename=test_filename)
     max_user_ids = max_min_user[1]
     max_item_ids = max_min_item[1]
     print(max_min_user, max_min_item)
