@@ -192,7 +192,12 @@ def train(data_dict: dict, model_local, batch_count: int):
 if __name__ == "__main__":
     train_filename, test_filename = sys.argv[1:]
     train_data, max_min_user, max_min_item = read_original_data(filename=train_filename)
-    test_data, _, _ = read_original_data(filename=test_filename)
+    test_data_original, _, _ = read_original_data(filename=test_filename)
+    test_data = dict()
+    selected_test = np.random.choice(list(range(len(test_data_original))), 1000, replace=False)
+    for test_idx, test_user in enumerate(test_data_original):
+        if test_idx in selected_test:
+            test_data[test_user] = test_data_original[test_user]
     max_user_ids = max_min_user[1]
     max_item_ids = max_min_item[1]
     print(max_min_user, max_min_item)
