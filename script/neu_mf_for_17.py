@@ -22,11 +22,15 @@ class NeuMF(torch.nn.Module):
                 # format is very good学习了
                 self.mlp.add_module("linear_{}".format(idx), nn.Linear(2 * n_factors, nums_hidden))
                 # Why do you add sigmoid, the out put is a score
-                self.mlp.add_module("activation_{}".format(idx), nn.Sigmoid())
+                self.mlp.add_module("activation_{}".format(idx), nn.ReLU())
+                self.mlp.add_module("dropout_{}".format(idx), nn.Dropout(0.2))
+            elif idx < len(nums_hiddens) - 1:
+                self.mlp.add_module("linear_{}".format(idx), nn.Linear(nums_hiddens[idx - 1], nums_hidden))
+                self.mlp.add_module("activation_{}".format(idx), nn.ReLU())
                 self.mlp.add_module("dropout_{}".format(idx), nn.Dropout(0.2))
             else:
                 self.mlp.add_module("linear_{}".format(idx), nn.Linear(nums_hiddens[idx - 1], nums_hidden))
-                self.mlp.add_module("activation_{}".format(idx), nn.Sigmoid())
+                self.mlp.add_module("activation_{}".format(idx), nn.ReLU())
                 self.mlp.add_module("dropout_{}".format(idx), nn.Dropout(0.2))
     
     def forward(self, user_id, item_id):
